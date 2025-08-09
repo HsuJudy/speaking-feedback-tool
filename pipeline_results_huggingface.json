@@ -1,0 +1,75 @@
+{
+  "results": [
+    {
+      "input_text": "i love this product! its amazing and works perfectly.",
+      "sentiment": "positive",
+      "confidence": 0.8,
+      "processed_at": "2025-08-09T11:35:59.237117",
+      "model_info": {
+        "version": "huggingface_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 0,
+      "sentiment_emoji": "\ud83d\ude0a"
+    },
+    {
+      "input_text": "this is the worst experience ive ever had. terrible service!",
+      "sentiment": "negative",
+      "confidence": 0.793,
+      "processed_at": "2025-08-09T11:35:59.237131",
+      "model_info": {
+        "version": "huggingface_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 1,
+      "sentiment_emoji": "\ud83d\ude1e"
+    },
+    {
+      "input_text": "the movie was okay, nothing special but not bad either.",
+      "sentiment": "negative",
+      "confidence": 0.886,
+      "processed_at": "2025-08-09T11:35:59.237138",
+      "model_info": {
+        "version": "huggingface_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 2,
+      "sentiment_emoji": "\ud83d\ude1e"
+    },
+    {
+      "input_text": "im feeling neutral about this situation.",
+      "sentiment": "neutral",
+      "confidence": 0.419,
+      "processed_at": "2025-08-09T11:35:59.237144",
+      "model_info": {
+        "version": "huggingface_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 3,
+      "sentiment_emoji": "\ud83d\ude10"
+    },
+    {
+      "input_text": "this restaurant has the most delicious food ive ever tasted!",
+      "sentiment": "positive",
+      "confidence": 0.74,
+      "processed_at": "2025-08-09T11:35:59.237150",
+      "model_info": {
+        "version": "huggingface_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 4,
+      "sentiment_emoji": "\ud83d\ude0a"
+    }
+  ],
+  "summary": {
+    "total_processed": 5,
+    "sentiment_distribution": {
+      "positive": 2,
+      "negative": 2,
+      "neutral": 1
+    },
+    "average_confidence": 0.728,
+    "summary_generated_at": "2025-08-09T11:35:59.237304"
+  },
+  "exported_at": "2025-08-09T11:35:59.237308"
+}

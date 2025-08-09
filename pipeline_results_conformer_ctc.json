@@ -1,0 +1,75 @@
+{
+  "results": [
+    {
+      "input_text": "i love this product! its amazing and works perfectly.",
+      "sentiment": "positive",
+      "confidence": 0.94,
+      "processed_at": "2025-08-09T11:36:01.571866",
+      "model_info": {
+        "version": "nemo_conformer_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 0,
+      "sentiment_emoji": "\ud83d\ude0a"
+    },
+    {
+      "input_text": "this is the worst experience ive ever had. terrible service!",
+      "sentiment": "negative",
+      "confidence": 0.866,
+      "processed_at": "2025-08-09T11:36:01.571880",
+      "model_info": {
+        "version": "nemo_conformer_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 1,
+      "sentiment_emoji": "\ud83d\ude1e"
+    },
+    {
+      "input_text": "the movie was okay, nothing special but not bad either.",
+      "sentiment": "negative",
+      "confidence": 0.858,
+      "processed_at": "2025-08-09T11:36:01.571887",
+      "model_info": {
+        "version": "nemo_conformer_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 2,
+      "sentiment_emoji": "\ud83d\ude1e"
+    },
+    {
+      "input_text": "im feeling neutral about this situation.",
+      "sentiment": "neutral",
+      "confidence": 0.446,
+      "processed_at": "2025-08-09T11:36:01.571895",
+      "model_info": {
+        "version": "nemo_conformer_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 3,
+      "sentiment_emoji": "\ud83d\ude10"
+    },
+    {
+      "input_text": "this restaurant has the most delicious food ive ever tasted!",
+      "sentiment": "positive",
+      "confidence": 0.745,
+      "processed_at": "2025-08-09T11:36:01.571902",
+      "model_info": {
+        "version": "nemo_conformer_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 4,
+      "sentiment_emoji": "\ud83d\ude0a"
+    }
+  ],
+  "summary": {
+    "total_processed": 5,
+    "sentiment_distribution": {
+      "positive": 2,
+      "negative": 2,
+      "neutral": 1
+    },
+    "average_confidence": 0.771,
+    "summary_generated_at": "2025-08-09T11:36:01.572073"
+  },
+  "exported_at": "2025-08-09T11:36:01.572077"
+}

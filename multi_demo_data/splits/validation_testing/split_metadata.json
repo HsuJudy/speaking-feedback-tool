@@ -1,0 +1,12 @@
+{
+  "split_name": "validation_testing",
+  "original_dataset": "multi_demo_data/validation_data.csv",
+  "train_ratio": 0.6,
+  "val_ratio": 0.2,
+  "test_ratio": 0.2,
+  "random_seed": 42,
+  "train_hash": "8dbd38e220577323be88608e4894d2efaeed25fb0c5006991ff26bb3b4cfc6e0",
+  "val_hash": "b9ce7844c3e9bfbc728ee9f38b13e6d45441c9f53fe5db90e35cf966a2f6e537",
+  "test_hash": "95ad999ae1c1e3047a399a935f295c1b8212f75c2f08d7831c980da99ba70637",
+  "created_at": "2025-08-01T15:28:07.088837"
+}

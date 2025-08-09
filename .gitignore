@@ -1,0 +1,155 @@
+# Environment variables and credentials
+.env
+*.env
+.env.local
+.env.production
+.env.staging
+
+# Zoom credentials and sensitive data
+zoom_credentials.json
+zoom_config.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+zoom_analysis.db
+sentiment_logs.db
+
+# Audio and video files
+*.mp4
+*.mp3
+*.wav
+*.m4a
+*.avi
+*.mov
+zoom_recordings/
+recordings/
+temp_audio/
+temp_video/
+
+# Model files and cache
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.onnx
+*.pt
+*.pth
+models/custom/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Logs
+*.log
+logs/
+log/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# WandB
+wandb/
+
+# MLflow
+mlruns/
+
+# DVC
+.dvc/
+dvc.lock
+
+# ngrok
+.ngrok2/
+
+# Flask
+instance/
+.webassets-cache
+
+# Node modules (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log* 

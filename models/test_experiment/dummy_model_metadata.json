@@ -1,0 +1,17 @@
+{
+  "model_name": "dummy_model",
+  "model_info": {
+    "model_type": "random_forest",
+    "feature_names": [
+      "feature_0",
+      "feature_1",
+      "feature_2",
+      "feature_3",
+      "feature_4"
+    ]
+  },
+  "evaluation_results": {
+    "accuracy": 0.75
+  },
+  "created_at": "2025-08-01T15:30:03.160886"
+}

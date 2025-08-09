@@ -1,0 +1,103 @@
+{
+  "a79da88d0c07473a3decbcd6c555f12388cfbf4d40e0c5952ca8e7719a09b737": {
+    "dataset_name": "emotion_classification_data",
+    "file_path": "multi_demo_data/emotion_dataset.csv",
+    "content_hash": "a79da88d0c07473a3decbcd6c555f12388cfbf4d40e0c5952ca8e7719a09b737",
+    "description": "Emotion classification dataset with audio features",
+    "tags": [
+      "emotion",
+      "audio",
+      "classification"
+    ],
+    "created_at": "2025-08-01T15:28:07.085339",
+    "file_size": 4724,
+    "file_modified": "2025-08-01T15:28:07.084739"
+  },
+  "9c99e564ac9927b99723cbc0784f0a6cf44ae6979b67c9c78b9ea41a7cf8981b": {
+    "dataset_name": "audio_feature_dataset",
+    "file_path": "multi_demo_data/audio_features.csv",
+    "content_hash": "9c99e564ac9927b99723cbc0784f0a6cf44ae6979b67c9c78b9ea41a7cf8981b",
+    "description": "Raw audio features for analysis",
+    "tags": [
+      "audio",
+      "features",
+      "spectral"
+    ],
+    "created_at": "2025-08-01T15:28:07.085451",
+    "file_size": 6274,
+    "file_modified": "2025-08-01T15:28:07.085082"
+  },
+  "cb7bd138842c8ca7790b5aa65ffe9f0c4abe537fe8f8ee3cf694ce858a660af7": {
+    "dataset_name": "validation_dataset",
+    "file_path": "multi_demo_data/validation_data.csv",
+    "content_hash": "cb7bd138842c8ca7790b5aa65ffe9f0c4abe537fe8f8ee3cf694ce858a660af7",
+    "description": "Validation dataset for model testing",
+    "tags": [
+      "validation",
+      "testing"
+    ],
+    "created_at": "2025-08-01T15:28:07.085546",
+    "file_size": 2089,
+    "file_modified": "2025-08-01T15:28:07.085293"
+  },
+  "27f0aada6f843c07797302968ceb96016b29717f22db921166e9824e8bedbf67": {
+    "dataset_name": "emotion_classification_train",
+    "file_path": "multi_demo_data/splits/emotion_classification/train.csv",
+    "content_hash": "27f0aada6f843c07797302968ceb96016b29717f22db921166e9824e8bedbf67",
+    "description": "Training split for emotion_classification",
+    "tags": [],
+    "created_at": "2025-08-01T15:28:07.087053",
+    "file_size": 3281,
+    "file_modified": "2025-08-01T15:28:07.086696"
+  },
+  "36c6c54c22809b07035b97932d2735f6163fc3e1371941f57bec86a3ec4645e4": {
+    "dataset_name": "emotion_classification_val",
+    "file_path": "multi_demo_data/splits/emotion_classification/val.csv",
+    "content_hash": "36c6c54c22809b07035b97932d2735f6163fc3e1371941f57bec86a3ec4645e4",
+    "description": "Validation split for emotion_classification",
+    "tags": [],
+    "created_at": "2025-08-01T15:28:07.087165",
+    "file_size": 737,
+    "file_modified": "2025-08-01T15:28:07.086864"
+  },
+  "f2fd34073c52dc79b261af637c106e990d75782d9e86dab1a24b125afdc85e90": {
+    "dataset_name": "emotion_classification_test",
+    "file_path": "multi_demo_data/splits/emotion_classification/test.csv",
+    "content_hash": "f2fd34073c52dc79b261af637c106e990d75782d9e86dab1a24b125afdc85e90",
+    "description": "Test split for emotion_classification",
+    "tags": [],
+    "created_at": "2025-08-01T15:28:07.087275",
+    "file_size": 723,
+    "file_modified": "2025-08-01T15:28:07.087022"
+  },
+  "8dbd38e220577323be88608e4894d2efaeed25fb0c5006991ff26bb3b4cfc6e0": {
+    "dataset_name": "validation_testing_train",
+    "file_path": "multi_demo_data/splits/validation_testing/train.csv",
+    "content_hash": "8dbd38e220577323be88608e4894d2efaeed25fb0c5006991ff26bb3b4cfc6e0",
+    "description": "Training split for validation_testing",
+    "tags": [],
+    "created_at": "2025-08-01T15:28:07.088482",
+    "file_size": 1243,
+    "file_modified": "2025-08-01T15:28:07.088117"
+  },
+  "b9ce7844c3e9bfbc728ee9f38b13e6d45441c9f53fe5db90e35cf966a2f6e537": {
+    "dataset_name": "validation_testing_val",
+    "file_path": "multi_demo_data/splits/validation_testing/val.csv",
+    "content_hash": "b9ce7844c3e9bfbc728ee9f38b13e6d45441c9f53fe5db90e35cf966a2f6e537",
+    "description": "Validation split for validation_testing",
+    "tags": [],
+    "created_at": "2025-08-01T15:28:07.088612",
+    "file_size": 432,
+    "file_modified": "2025-08-01T15:28:07.088290"
+  },
+  "95ad999ae1c1e3047a399a935f295c1b8212f75c2f08d7831c980da99ba70637": {
+    "dataset_name": "validation_testing_test",
+    "file_path": "multi_demo_data/splits/validation_testing/test.csv",
+    "content_hash": "95ad999ae1c1e3047a399a935f295c1b8212f75c2f08d7831c980da99ba70637",
+    "description": "Test split for validation_testing",
+    "tags": [],
+    "created_at": "2025-08-01T15:28:07.088730",
+    "file_size": 430,
+    "file_modified": "2025-08-01T15:28:07.088455"
+  }
+}

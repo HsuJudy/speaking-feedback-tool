@@ -1,0 +1,25 @@
+{
+  "test_model_id": {
+    "model_name": "dummy_model",
+    "model_path": "models/test_experiment/dummy_model.pkl",
+    "metadata_path": "models/test_experiment/dummy_model_metadata.json",
+    "accuracy": 0.75,
+    "created_at": "2025-08-01T15:30:03.160984"
+  },
+  "5782fb49-5045-4920-bc25-4e7a7187dd44": {
+    "model_name": "random_forest_20250801_153009",
+    "experiment_name": "emotion_classification_test",
+    "model_path": "models/emotion_classification_test/random_forest_20250801_153009.pkl",
+    "metadata_path": "models/emotion_classification_test/random_forest_20250801_153009_metadata.json",
+    "accuracy": 0.27,
+    "created_at": "2025-08-01T15:30:09.731010"
+  },
+  "d2f557a1-1518-4ea9-aca7-36b5a9253753": {
+    "model_name": "random_forest_20250809_113621",
+    "experiment_name": "emotion_classification_test",
+    "model_path": "models/emotion_classification_test/random_forest_20250809_113621.pkl",
+    "metadata_path": "models/emotion_classification_test/random_forest_20250809_113621_metadata.json",
+    "accuracy": 0.27,
+    "created_at": "2025-08-09T11:36:21.502334"
+  }
+}

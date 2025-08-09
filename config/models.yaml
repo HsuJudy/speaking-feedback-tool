@@ -1,0 +1,120 @@
+# Model Configuration for Sentiment Analysis Pipeline
+# This file defines different model configurations that can be dynamically loaded
+
+models:
+  # Dummy model for testing (current implementation)
+  dummy:
+    type: "dummy"
+    version: "v1.0"
+    confidence_threshold: 0.5
+    emotion_labels: ["calm", "anxious", "frustrated", "energetic", "burned_out"]
+    description: "Dummy model for testing pipeline functionality"
+    
+  # HuggingFace Transformers model
+  huggingface:
+    type: "huggingface"
+    model_name: "cardiffnlp/twitter-roberta-base-sentiment-latest"
+    version: "v1.0"
+    confidence_threshold: 0.5
+    emotion_labels: ["calm", "anxious", "frustrated", "energetic", "burned_out"]
+    description: "HuggingFace transformers model for emotion analysis"
+    config:
+      max_length: 512
+      truncation: true
+      padding: true
+      return_all_scores: false
+      device: "auto"  # auto, cpu, cuda
+      batch_size: 32
+    
+  # NVIDIA NeMo models
+  nemo:
+    type: "nemo"
+    model_name: "emotion_classification_model"
+    version: "v1.0"
+    confidence_threshold: 0.5
+    emotion_labels: ["calm", "anxious", "frustrated", "energetic", "burned_out"]
+    description: "NVIDIA NeMo model for emotion analysis"
+    config:
+      model_path: "./models/nemo_emotion_model.nemo"
+      device: "auto"  # auto, cpu, cuda
+      batch_size: 16
+      max_sequence_length: 512
+      use_amp: true  # Automatic Mixed Precision
+      
+  # QuartzNet15x5 model for speech recognition
+  quartznet15x5:
+    type: "nemo_quartznet"
+    model_name: "quartznet15x5"
+    version: "v1.0"
+    confidence_threshold: 0.5
+    emotion_labels: ["calm", "anxious", "frustrated", "energetic", "burned_out"]
+    description: "QuartzNet15x5 model for speech-to-text and emotion analysis"
+    config:
+      model_name: "nvidia/quartznet15x5"
+      device: "auto"  # auto, cpu, cuda
+      batch_size: 8
+      max_audio_length: 30  # seconds
+      sample_rate: 16000
+      use_amp: true
+      language: "en"
+      
+  # ConformerCTC model for speech recognition
+  conformer_ctc:
+    type: "nemo_conformer"
+    model_name: "conformer_ctc"
+    version: "v1.0"
+    confidence_threshold: 0.5
+    emotion_labels: ["calm", "anxious", "frustrated", "energetic", "burned_out"]
+    description: "ConformerCTC model for speech recognition and emotion analysis"
+    config:
+      model_name: "nvidia/stt_en_conformer_ctc_large"
+      device: "auto"
+      batch_size: 4
+      max_audio_length: 30
+      sample_rate: 16000
+      use_amp: true
+      language: "en"
+      
+  # Custom audio emotion model
+  audio_emotion:
+    type: "audio_emotion"
+    model_name: "audio_emotion_classifier"
+    version: "v1.0"
+    confidence_threshold: 0.5
+    emotion_labels: ["calm", "anxious", "frustrated", "energetic", "burned_out"]
+    description: "Custom audio-based emotion detection model"
+    config:
+      feature_extractor: "audio_features"
+      model_path: "./models/custom/audio_emotion_model.pkl"
+      device: "auto"
+      sample_rate: 16000
+      frame_length: 0.025
+      hop_length: 0.010
+
+# Default model to use
+default_model: "dummy"
+
+# Model loading settings
+model_loading:
+  cache_dir: "./model_cache"
+  download_models: true
+  verify_checksums: true
+  timeout: 300  # seconds
+  
+# Environment-specific overrides
+environments:
+  development:
+    default_model: "dummy"
+    model_loading:
+      download_models: false
+      
+  testing:
+    default_model: "dummy"
+    model_loading:
+      download_models: false
+      
+  production:
+    default_model: "huggingface"
+    model_loading:
+      download_models: true
+      verify_checksums: true 

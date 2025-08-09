@@ -1,0 +1,73 @@
+{
+  "results": [
+    {
+      "input_text": "Error processing audio: Audio loading failed",
+      "sentiment": "unknown",
+      "confidence": 0.0,
+      "processed_at": "2025-08-09T11:36:06.437861",
+      "model_info": {
+        "version": "audio_emotion_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 0,
+      "sentiment_emoji": "\u2753"
+    },
+    {
+      "input_text": "Error processing audio: Audio loading failed",
+      "sentiment": "unknown",
+      "confidence": 0.0,
+      "processed_at": "2025-08-09T11:36:06.437876",
+      "model_info": {
+        "version": "audio_emotion_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 1,
+      "sentiment_emoji": "\u2753"
+    },
+    {
+      "input_text": "Error processing audio: Audio loading failed",
+      "sentiment": "unknown",
+      "confidence": 0.0,
+      "processed_at": "2025-08-09T11:36:06.437901",
+      "model_info": {
+        "version": "audio_emotion_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 2,
+      "sentiment_emoji": "\u2753"
+    },
+    {
+      "input_text": "Error processing audio: Audio loading failed",
+      "sentiment": "unknown",
+      "confidence": 0.0,
+      "processed_at": "2025-08-09T11:36:06.437927",
+      "model_info": {
+        "version": "audio_emotion_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 3,
+      "sentiment_emoji": "\u2753"
+    },
+    {
+      "input_text": "Error processing audio: Audio loading failed",
+      "sentiment": "unknown",
+      "confidence": 0.0,
+      "processed_at": "2025-08-09T11:36:06.437938",
+      "model_info": {
+        "version": "audio_emotion_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 4,
+      "sentiment_emoji": "\u2753"
+    }
+  ],
+  "summary": {
+    "total_processed": 5,
+    "sentiment_distribution": {
+      "unknown": 5
+    },
+    "average_confidence": 0.0,
+    "summary_generated_at": "2025-08-09T11:36:06.438143"
+  },
+  "exported_at": "2025-08-09T11:36:06.438147"
+}

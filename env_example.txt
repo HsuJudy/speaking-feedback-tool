@@ -1,0 +1,26 @@
+# Zoom API Credentials
+ZOOM_CLIENT_ID=your_client_id_here
+ZOOM_CLIENT_SECRET=your_client_secret_here
+ZOOM_ACCOUNT_ID=your_account_id_here
+ZOOM_WEBHOOK_SECRET=your_webhook_secret_here
+
+# Webhook Configuration
+ZOOM_WEBHOOK_URL=https://your-domain.com/webhook/zoom
+ZOOM_APP_NAME=Speaking Feedback Tool
+
+# Storage Configuration
+ZOOM_RECORDINGS_DIR=zoom_recordings
+ZOOM_MAX_FILE_SIZE=500
+
+# Audio Processing
+ZOOM_ENABLE_AUDIO_EXTRACTION=true
+ZOOM_AUDIO_SAMPLE_RATE=16000
+ZOOM_AUDIO_CHANNELS=1
+
+# Security
+ZOOM_VERIFY_SIGNATURES=true
+ZOOM_ALLOWED_IPS=192.168.1.1,10.0.0.1
+
+# Flask Configuration
+FLASK_ENV=development
+PORT=5000 
