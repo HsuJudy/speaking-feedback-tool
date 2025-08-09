@@ -1,0 +1,158 @@
+name: Security Scanning
+
+on:
+  schedule:
+    # Run every day at 6 AM UTC
+    - cron: '0 6 * * *'
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+
+jobs:
+  # ========================================
+  # DEPENDENCY VULNERABILITY SCAN
+  # ========================================
+  dependency-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run Safety check
+      run: |
+        pip install safety
+        safety check --json --output safety-report.json || true
+        
+    - name: Run Bandit security scan
+      run: |
+        pip install bandit
+        bandit -r . -f json -o bandit-report.json || true
+        
+    - name: Run Semgrep
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/secrets
+          p/owasp-top-ten
+        json-output: semgrep-report.json
+        
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          safety-report.json
+          bandit-report.json
+          semgrep-report.json
+
+  # ========================================
+  # CONTAINER SECURITY SCAN
+  # ========================================
+  container-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build Docker image
+      run: |
+        docker build -t speaking-feedback-tool .
+        
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'speaking-feedback-tool:latest'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # ========================================
+  # SECRET SCANNING
+  # ========================================
+  secret-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run TruffleHog
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: .
+        base: HEAD~1
+        head: HEAD
+        extra_args: --only-verified --json
+
+  # ========================================
+  # LICENSE COMPLIANCE
+  # ========================================
+  license-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run License Check
+      run: |
+        pip install pip-licenses
+        pip-licenses --format=json --output-file=licenses.json
+        
+    - name: Upload license report
+      uses: actions/upload-artifact@v3
+      with:
+        name: license-report
+        path: licenses.json
+
+  # ========================================
+  # SECURITY NOTIFICATIONS
+  # ========================================
+  security-notifications:
+    needs: [dependency-scan, container-scan, secret-scan, license-scan]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Download security reports
+      uses: actions/download-artifact@v3
+      with:
+        name: security-reports
+        
+    - name: Check for high severity vulnerabilities
+      run: |
+        if [ -f safety-report.json ]; then
+          echo "Checking Safety report for high severity issues..."
+          # Add logic to check for high severity issues
+        fi
+        
+        if [ -f bandit-report.json ]; then
+          echo "Checking Bandit report for security issues..."
+          # Add logic to check for security issues
+        fi
+        
+    - name: Send security alert
+      if: failure()
+      run: |
+        echo "🚨 Security vulnerabilities detected!"
+        echo "Please review the security reports and fix any issues."
+        exit 1 

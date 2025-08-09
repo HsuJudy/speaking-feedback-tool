@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Speaking Feedback Tool{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshDashboard()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="fas fa-calendar"></i> Last 7 Days
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" onclick="setTimeRange('today')">Today</a></li>
+            <li><a class="dropdown-item" href="#" onclick="setTimeRange('week')">Last 7 Days</a></li>
+            <li><a class="dropdown-item" href="#" onclick="setTimeRange('month')">Last 30 Days</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="metric-value" id="total-meetings">-</div>
+            <div class="metric-label">Total Meetings</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="metric-value" id="avg-sentiment-score">-</div>
+            <div class="metric-label">Avg Sentiment</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="metric-value" id="avg-stress-level">-</div>
+            <div class="metric-label">Avg Stress Level</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="metric-value" id="system-status">Online</div>
+            <div class="metric-label">System Status</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Sentiment Trends
+            </div>
+            <div class="card-body">
+                <canvas id="sentimentChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i> Emotion Distribution
+            </div>
+            <div class="card-body">
+                <canvas id="emotionChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Meetings -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-video"></i> Recent Meetings
+            </div>
+            <div class="card-body">
+                <div id="recent-meetings">
+                    <div class="loading"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle"></i> Alerts
+            </div>
+            <div class="card-body">
+                <div id="alerts">
+                    <div class="loading"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Webhook Status -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-link"></i> Integration Status
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-circle text-success me-2"></i>
+                            <span>Zoom Integration</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-circle text-success me-2"></i>
+                            <span>ML Models</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-circle text-success me-2"></i>
+                            <span>Database</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-circle text-success me-2"></i>
+                            <span>Monitoring</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let sentimentChart, emotionChart;
+let currentTimeRange = 'week';
+
+// Initialize charts
+function initCharts() {
+    // Sentiment Chart
+    const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
+    sentimentChart = new Chart(sentimentCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Sentiment Score',
+                data: [],
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1
+                }
+            }
+        }
+    });
+
+    // Emotion Chart
+    const emotionCtx = document.getElementById('emotionChart').getContext('2d');
+    emotionChart = new Chart(emotionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Happy', 'Neutral', 'Sad', 'Angry', 'Fearful'],
+            datasets: [{
+                data: [0, 0, 0, 0, 0],
+                backgroundColor: [
+                    '#28a745',
+                    '#6c757d',
+                    '#17a2b8',
+                    '#dc3545',
+                    '#ffc107'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+// Load dashboard data
+function loadDashboardData() {
+    // Load metrics
+    fetch('/api/stats/dashboard?range=' + currentTimeRange)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('total-meetings').textContent = data.total_meetings || 0;
+            document.getElementById('avg-sentiment-score').textContent = data.avg_sentiment ? data.avg_sentiment.toFixed(2) : 'N/A';
+            document.getElementById('avg-stress-level').textContent = data.avg_stress ? data.avg_stress.toFixed(2) : 'N/A';
+            
+            // Update charts
+            if (data.sentiment_trend) {
+                sentimentChart.data.labels = data.sentiment_trend.labels;
+                sentimentChart.data.datasets[0].data = data.sentiment_trend.data;
+                sentimentChart.update();
+            }
+            
+            if (data.emotion_distribution) {
+                emotionChart.data.datasets[0].data = data.emotion_distribution;
+                emotionChart.update();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading dashboard data:', error);
+            showError('total-meetings', 'Failed to load dashboard data');
+        });
+}
+
+// Load recent meetings
+function loadRecentMeetings() {
+    fetch('/api/meetings/recent')
+        .then(response => response.json())
+        .then(data => {
+            if (data.meetings && data.meetings.length > 0) {
+                const meetingsHtml = data.meetings.map(meeting => `
+                    <div class="meeting-card card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="card-title">${meeting.topic || 'Untitled Meeting'}</h6>
+                                    <p class="card-text text-muted">
+                                        <i class="fas fa-calendar"></i> ${formatDate(meeting.start_time)}
+                                        <br>
+                                        <i class="fas fa-clock"></i> ${formatDuration(meeting.duration)}
+                                    </p>
+                                </div>
+                                <div class="text-end">
+                                    <span class="status-badge status-${meeting.sentiment_score > 0.5 ? 'success' : meeting.sentiment_score < -0.5 ? 'danger' : 'warning'}">
+                                        ${meeting.sentiment_score ? meeting.sentiment_score.toFixed(2) : 'N/A'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <small class="text-muted">Sentiment: ${meeting.sentiment_score ? meeting.sentiment_score.toFixed(2) : 'N/A'}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Stress: ${meeting.stress_level ? meeting.stress_level.toFixed(2) : 'N/A'}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('recent-meetings').innerHTML = meetingsHtml;
+            } else {
+                document.getElementById('recent-meetings').innerHTML = '<p class="text-muted">No recent meetings found.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading recent meetings:', error);
+            showError('recent-meetings', 'Failed to load recent meetings');
+        });
+}
+
+// Load alerts
+function loadAlerts() {
+    fetch('/api/alerts')
+        .then(response => response.json())
+        .then(data => {
+            if (data.alerts && data.alerts.length > 0) {
+                const alertsHtml = data.alerts.map(alert => `
+                    <div class="alert alert-${alert.level} alert-dismissible fade show">
+                        <i class="fas fa-${alert.icon}"></i> ${alert.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `).join('');
+                document.getElementById('alerts').innerHTML = alertsHtml;
+            } else {
+                document.getElementById('alerts').innerHTML = '<p class="text-muted">No alerts at this time.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading alerts:', error);
+            showError('alerts', 'Failed to load alerts');
+        });
+}
+
+// Refresh dashboard
+function refreshDashboard() {
+    loadDashboardData();
+    loadRecentMeetings();
+    loadAlerts();
+    loadQuickStats();
+}
+
+// Set time range
+function setTimeRange(range) {
+    currentTimeRange = range;
+    loadDashboardData();
+}
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initCharts();
+    loadDashboardData();
+    loadRecentMeetings();
+    loadAlerts();
+    
+    // Auto-refresh every 30 seconds
+    setInterval(refreshDashboard, 30000);
+});
+</script>
+{% endblock %} 

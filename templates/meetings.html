@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}Meetings - Speaking Feedback Tool{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-video"></i> Meetings
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshMeetings()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#meetingModal">
+            <i class="fas fa-plus"></i> New Meeting
+        </button>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="searchInput" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search meetings...">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dateFilter" class="form-label">Date Range</label>
+                        <select class="form-select" id="dateFilter">
+                            <option value="all">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="sentimentFilter" class="form-label">Sentiment</label>
+                        <select class="form-select" id="sentimentFilter">
+                            <option value="all">All</option>
+                            <option value="positive">Positive</option>
+                            <option value="neutral">Neutral</option>
+                            <option value="negative">Negative</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="stressFilter" class="form-label">Stress Level</label>
+                        <select class="form-select" id="stressFilter">
+                            <option value="all">All</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Meetings List -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-list"></i> Meetings List</span>
+                    <span class="badge bg-primary" id="meeting-count">0 meetings</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="meetings-list">
+                    <div class="loading"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Meeting Details Modal -->
+<div class="modal fade" id="meetingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meetingModalTitle">Meeting Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="meetingModalBody">
+                <div class="loading"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="downloadAnalysis">Download Analysis</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let meetings = [];
+let currentFilters = {
+    search: '',
+    dateRange: 'all',
+    sentiment: 'all',
+    stressLevel: 'all'
+};
+
+// Load meetings
+function loadMeetings() {
+    showLoading('meetings-list');
+    
+    const params = new URLSearchParams();
+    if (currentFilters.search) params.append('search', currentFilters.search);
+    if (currentFilters.dateRange !== 'all') params.append('date_range', currentFilters.dateRange);
+    if (currentFilters.sentiment !== 'all') params.append('sentiment', currentFilters.sentiment);
+    if (currentFilters.stressLevel !== 'all') params.append('stress_level', currentFilters.stressLevel);
+    
+    fetch('/api/meetings?' + params.toString())
+        .then(response => response.json())
+        .then(data => {
+            meetings = data.meetings || [];
+            displayMeetings(meetings);
+            document.getElementById('meeting-count').textContent = `${meetings.length} meetings`;
+        })
+        .catch(error => {
+            console.error('Error loading meetings:', error);
+            showError('meetings-list', 'Failed to load meetings');
+        });
+}
+
+// Display meetings
+function displayMeetings(meetingsToShow) {
+    if (meetingsToShow.length === 0) {
+        document.getElementById('meetings-list').innerHTML = '<p class="text-muted">No meetings found.</p>';
+        return;
+    }
+    
+    const meetingsHtml = meetingsToShow.map(meeting => `
+        <div class="meeting-card card mb-3" onclick="showMeetingDetails('${meeting.meeting_id}')">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6 class="card-title">${meeting.topic || 'Untitled Meeting'}</h6>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-calendar"></i> ${formatDate(meeting.start_time)}
+                            <br>
+                            <i class="fas fa-clock"></i> ${formatDuration(meeting.duration)}
+                            <br>
+                            <i class="fas fa-users"></i> ${meeting.participants_count || 0} participants
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="mb-2">
+                            <span class="status-badge status-${getSentimentColor(meeting.sentiment_score)}">
+                                Sentiment: ${meeting.sentiment_score ? meeting.sentiment_score.toFixed(2) : 'N/A'}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="status-badge status-${getStressColor(meeting.stress_level)}">
+                                Stress: ${meeting.stress_level ? meeting.stress_level.toFixed(2) : 'N/A'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <small class="text-muted">
+                            <i class="fas fa-brain"></i> Emotion: ${meeting.emotion_prediction || 'N/A'}
+                            <br>
+                            <i class="fas fa-chart-line"></i> Confidence: ${meeting.confidence_score ? (meeting.confidence_score * 100).toFixed(1) + '%' : 'N/A'}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    document.getElementById('meetings-list').innerHTML = meetingsHtml;
+}
+
+// Get sentiment color
+function getSentimentColor(score) {
+    if (!score) return 'warning';
+    if (score > 0.3) return 'success';
+    if (score < -0.3) return 'danger';
+    return 'warning';
+}
+
+// Get stress color
+function getStressColor(level) {
+    if (!level) return 'info';
+    if (level > 0.7) return 'danger';
+    if (level > 0.4) return 'warning';
+    return 'success';
+}
+
+// Show meeting details
+function showMeetingDetails(meetingId) {
+    const modal = new bootstrap.Modal(document.getElementById('meetingModal'));
+    modal.show();
+    
+    showLoading('meetingModalBody');
+    
+    fetch(`/api/meetings/${meetingId}/details`)
+        .then(response => response.json())
+        .then(data => {
+            const meeting = data.meeting;
+            const analysis = data.analysis;
+            
+            document.getElementById('meetingModalTitle').textContent = meeting.topic || 'Meeting Details';
+            
+            const modalHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Meeting Information</h6>
+                        <table class="table table-sm">
+                            <tr><td>Meeting ID:</td><td>${meeting.meeting_id}</td></tr>
+                            <tr><td>Topic:</td><td>${meeting.topic || 'N/A'}</td></tr>
+                            <tr><td>Start Time:</td><td>${formatDate(meeting.start_time)}</td></tr>
+                            <tr><td>Duration:</td><td>${formatDuration(meeting.duration)}</td></tr>
+                            <tr><td>Participants:</td><td>${meeting.participants_count || 0}</td></tr>
+                            <tr><td>Recording Status:</td><td>${meeting.recording_status || 'N/A'}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Analysis Results</h6>
+                        <table class="table table-sm">
+                            <tr><td>Sentiment Score:</td><td>${analysis.sentiment_score ? analysis.sentiment_score.toFixed(3) : 'N/A'}</td></tr>
+                            <tr><td>Stress Level:</td><td>${analysis.stress_level ? analysis.stress_level.toFixed(3) : 'N/A'}</td></tr>
+                            <tr><td>Confidence Score:</td><td>${analysis.confidence_score ? (analysis.confidence_score * 100).toFixed(1) + '%' : 'N/A'}</td></tr>
+                            <tr><td>Emotion Prediction:</td><td>${analysis.emotion_prediction || 'N/A'}</td></tr>
+                            <tr><td>Processed At:</td><td>${formatDate(analysis.processed_at)}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                ${analysis.analysis_data ? `
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Detailed Analysis</h6>
+                        <pre class="bg-light p-3 rounded">${JSON.stringify(JSON.parse(analysis.analysis_data), null, 2)}</pre>
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('meetingModalBody').innerHTML = modalHtml;
+            
+            // Set download button
+            document.getElementById('downloadAnalysis').onclick = () => downloadAnalysis(meetingId);
+        })
+        .catch(error => {
+            console.error('Error loading meeting details:', error);
+            showError('meetingModalBody', 'Failed to load meeting details');
+        });
+}
+
+// Download analysis
+function downloadAnalysis(meetingId) {
+    fetch(`/api/meetings/${meetingId}/download`)
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `meeting_${meetingId}_analysis.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        })
+        .catch(error => {
+            console.error('Error downloading analysis:', error);
+            alert('Failed to download analysis');
+        });
+}
+
+// Refresh meetings
+function refreshMeetings() {
+    loadMeetings();
+}
+
+// Apply filters
+function applyFilters() {
+    currentFilters.search = document.getElementById('searchInput').value;
+    currentFilters.dateRange = document.getElementById('dateFilter').value;
+    currentFilters.sentiment = document.getElementById('sentimentFilter').value;
+    currentFilters.stressLevel = document.getElementById('stressFilter').value;
+    
+    loadMeetings();
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    loadMeetings();
+    
+    // Add event listeners for filters
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('dateFilter').addEventListener('change', applyFilters);
+    document.getElementById('sentimentFilter').addEventListener('change', applyFilters);
+    document.getElementById('stressFilter').addEventListener('change', applyFilters);
+});
+</script>
+{% endblock %} 

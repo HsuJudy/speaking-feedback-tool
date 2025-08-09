@@ -1,0 +1,712 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Speaking Feedback Tool{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-cog"></i> Settings
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshSettings()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="saveSettings()">
+            <i class="fas fa-save"></i> Save Changes
+        </button>
+    </div>
+</div>
+
+<!-- Configuration Status -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> Configuration Status
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-circle" id="zoom-status-icon" style="color: #dc3545;"></i>
+                            <span class="ms-2" id="zoom-status-text">Zoom: Not Configured</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-circle" id="webhook-status-icon" style="color: #dc3545;"></i>
+                            <span class="ms-2" id="webhook-status-text">Webhook: Not Configured</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-circle" id="database-status-icon" style="color: #28a745;"></i>
+                            <span class="ms-2" id="database-status-text">Database: Ready</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-circle" id="models-status-icon" style="color: #28a745;"></i>
+                            <span class="ms-2" id="models-status-text">Models: Ready</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Tabs -->
+<ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">
+            <i class="fas fa-cog"></i> General
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="zoom-tab" data-bs-toggle="tab" data-bs-target="#zoom" type="button" role="tab">
+            <i class="fas fa-video"></i> Zoom Integration
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="ml-tab" data-bs-toggle="tab" data-bs-target="#ml" type="button" role="tab">
+            <i class="fas fa-brain"></i> ML Models
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="monitoring-tab" data-bs-toggle="tab" data-bs-target="#monitoring" type="button" role="tab">
+            <i class="fas fa-chart-line"></i> Monitoring
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+            <i class="fas fa-shield-alt"></i> Security
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="settingsTabContent">
+    <!-- General Settings -->
+    <div class="tab-pane fade show active" id="general" role="tabpanel">
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle"></i> Application Settings
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="appName" class="form-label">Application Name</label>
+                            <input type="text" class="form-control" id="appName" value="Speaking Feedback Tool" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="appVersion" class="form-label">Version</label>
+                            <input type="text" class="form-control" id="appVersion" value="1.0.0" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="debugMode" class="form-label">Debug Mode</label>
+                            <select class="form-select" id="debugMode">
+                                <option value="false">Disabled</option>
+                                <option value="true">Enabled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="logLevel" class="form-label">Log Level</label>
+                            <select class="form-select" id="logLevel">
+                                <option value="INFO">Info</option>
+                                <option value="DEBUG">Debug</option>
+                                <option value="WARNING">Warning</option>
+                                <option value="ERROR">Error</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-database"></i> Database Settings
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="dbPath" class="form-label">Database Path</label>
+                            <input type="text" class="form-control" id="dbPath" value="zoom_analysis.db" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dbSize" class="form-label">Database Size</label>
+                            <input type="text" class="form-control" id="dbSize" value="-" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="backupEnabled" class="form-label">Auto Backup</label>
+                            <select class="form-select" id="backupEnabled">
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-primary" onclick="backupDatabase()">
+                                <i class="fas fa-download"></i> Backup Now
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="clearDatabase()">
+                                <i class="fas fa-trash"></i> Clear Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zoom Integration Settings -->
+    <div class="tab-pane fade" id="zoom" role="tabpanel">
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-key"></i> API Credentials
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>Credentials are stored in environment variables</strong><br>
+                            Edit your <code>.env</code> file to configure Zoom credentials.
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Client ID</label>
+                            <input type="text" class="form-control" value="***" readonly>
+                            <small class="text-muted">Set ZOOM_CLIENT_ID in .env file</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Client Secret</label>
+                            <input type="password" class="form-control" value="***" readonly>
+                            <small class="text-muted">Set ZOOM_CLIENT_SECRET in .env file</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Webhook Secret</label>
+                            <input type="password" class="form-control" value="***" readonly>
+                            <small class="text-muted">Set ZOOM_WEBHOOK_SECRET in .env file</small>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-primary" onclick="testZoomConnection()">
+                                <i class="fas fa-plug"></i> Test Connection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-cog"></i> Webhook Configuration
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="webhookUrl" class="form-label">Webhook URL</label>
+                            <input type="text" class="form-control" id="webhookUrl" value="https://your-domain.com/webhook/zoom" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="webhookEvents" class="form-label">Subscribed Events</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="meetingStarted" checked>
+                                <label class="form-check-label" for="meetingStarted">Meeting Started</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="meetingEnded" checked>
+                                <label class="form-check-label" for="meetingEnded">Meeting Ended</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="recordingCompleted" checked>
+                                <label class="form-check-label" for="recordingCompleted">Recording Completed</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="autoDownload" class="form-label">Auto Download Recordings</label>
+                            <select class="form-select" id="autoDownload">
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Setup Required:</strong><br>
+                                1. Create a Zoom App in the Marketplace<br>
+                                2. Add your webhook URL<br>
+                                3. Configure environment variables in .env file
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ML Models Settings -->
+    <div class="tab-pane fade" id="ml" role="tabpanel">
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-brain"></i> Model Configuration
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="sentimentModel" class="form-label">Sentiment Model</label>
+                            <select class="form-select" id="sentimentModel">
+                                <option value="custom">Custom Model</option>
+                                <option value="huggingface">HuggingFace</option>
+                                <option value="nemo">NeMo</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="emotionModel" class="form-label">Emotion Model</label>
+                            <select class="form-select" id="emotionModel">
+                                <option value="custom">Custom Model</option>
+                                <option value="huggingface">HuggingFace</option>
+                                <option value="nemo">NeMo</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confidenceThreshold" class="form-label">Confidence Threshold</label>
+                            <input type="range" class="form-range" id="confidenceThreshold" min="0" max="1" step="0.1" value="0.7">
+                            <small class="text-muted">Current: <span id="confidenceValue">0.7</span></small>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-primary" onclick="testModels()">
+                                <i class="fas fa-play"></i> Test Models
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="retrainModels()">
+                                <i class="fas fa-sync"></i> Retrain Models
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i> Model Performance
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Sentiment Model Accuracy</label>
+                            <div class="progress">
+                                <div class="progress-bar" id="sentimentAccuracy" role="progressbar" style="width: 85%">85%</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Emotion Model Accuracy</label>
+                            <div class="progress">
+                                <div class="progress-bar" id="emotionAccuracy" role="progressbar" style="width: 78%">78%</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Average Inference Time</label>
+                            <div class="progress">
+                                <div class="progress-bar bg-info" id="inferenceTime" role="progressbar" style="width: 60%">2.3s</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-info" onclick="viewModelDetails()">
+                                <i class="fas fa-info-circle"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monitoring Settings -->
+    <div class="tab-pane fade" id="monitoring" role="tabpanel">
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar"></i> Metrics Configuration
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="metricsEnabled" class="form-label">Enable Metrics</label>
+                            <select class="form-select" id="metricsEnabled">
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="metricsInterval" class="form-label">Metrics Collection Interval</label>
+                            <select class="form-select" id="metricsInterval">
+                                <option value="30">30 seconds</option>
+                                <option value="60">1 minute</option>
+                                <option value="300">5 minutes</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="alertEnabled" class="form-label">Enable Alerts</label>
+                            <select class="form-select" id="alertEnabled">
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="alertThreshold" class="form-label">Alert Threshold</label>
+                            <input type="number" class="form-control" id="alertThreshold" value="0.8" min="0" max="1" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-bell"></i> Alert Configuration
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Alert Types</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="highStressAlert" checked>
+                                <label class="form-check-label" for="highStressAlert">High Stress Level</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="negativeSentimentAlert" checked>
+                                <label class="form-check-label" for="negativeSentimentAlert">Negative Sentiment</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="modelFailureAlert" checked>
+                                <label class="form-check-label" for="modelFailureAlert">Model Failures</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="webhookFailureAlert" checked>
+                                <label class="form-check-label" for="webhookFailureAlert">Webhook Failures</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notificationEmail" class="form-label">Notification Email</label>
+                            <input type="email" class="form-control" id="notificationEmail" placeholder="admin@example.com">
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-primary" onclick="testAlerts()">
+                                <i class="fas fa-bell"></i> Test Alerts
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="tab-pane fade" id="security" role="tabpanel">
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-shield-alt"></i> Security Configuration
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="webhookVerification" class="form-label">Webhook Verification</label>
+                            <select class="form-select" id="webhookVerification">
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rateLimiting" class="form-label">Rate Limiting</label>
+                            <select class="form-select" id="rateLimiting">
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="maxRequests" class="form-label">Max Requests per Minute</label>
+                            <input type="number" class="form-control" id="maxRequests" value="100" min="1" max="1000">
+                        </div>
+                        <div class="mb-3">
+                            <label for="sessionTimeout" class="form-label">Session Timeout (minutes)</label>
+                            <input type="number" class="form-control" id="sessionTimeout" value="30" min="5" max="480">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-lock"></i> Access Control
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="requireAuth" class="form-label">Require Authentication</label>
+                            <select class="form-select" id="requireAuth">
+                                <option value="false">Disabled</option>
+                                <option value="true">Enabled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="allowedOrigins" class="form-label">Allowed Origins (CORS)</label>
+                            <textarea class="form-control" id="allowedOrigins" rows="3" placeholder="https://your-domain.com&#10;https://app.your-domain.com"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-warning" onclick="rotateSecrets()">
+                                <i class="fas fa-key"></i> Rotate Secrets
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Load settings
+function loadSettings() {
+    fetch('/api/settings')
+        .then(response => response.json())
+        .then(data => {
+            // Update status indicators
+            updateStatusIndicator('zoom-status-icon', 'zoom-status-text', data.zoom_configured, 'Zoom');
+            updateStatusIndicator('webhook-status-icon', 'webhook-status-text', data.webhook_configured, 'Webhook');
+            updateStatusIndicator('database-status-icon', 'database-status-text', data.database_configured, 'Database');
+            updateStatusIndicator('models-status-icon', 'models-status-text', data.models_configured, 'Models');
+            
+            // Populate form fields
+            document.getElementById('appName').value = data.app_name || 'Speaking Feedback Tool';
+            document.getElementById('appVersion').value = data.app_version || '1.0.0';
+            document.getElementById('debugMode').value = data.debug_mode ? 'true' : 'false';
+            document.getElementById('logLevel').value = data.log_level || 'INFO';
+            document.getElementById('dbPath').value = data.db_path || 'zoom_analysis.db';
+            document.getElementById('dbSize').value = data.db_size || '-';
+            document.getElementById('backupEnabled').value = data.backup_enabled ? 'true' : 'false';
+            
+            // Zoom settings (read-only)
+            document.getElementById('webhookUrl').value = data.webhook_url || 'https://your-domain.com/webhook/zoom';
+            document.getElementById('autoDownload').value = data.auto_download ? 'true' : 'false';
+            
+            // ML settings
+            document.getElementById('sentimentModel').value = data.sentiment_model || 'custom';
+            document.getElementById('emotionModel').value = data.emotion_model || 'custom';
+            document.getElementById('confidenceThreshold').value = data.confidence_threshold || 0.7;
+            document.getElementById('confidenceValue').textContent = data.confidence_threshold || 0.7;
+            
+            // Monitoring settings
+            document.getElementById('metricsEnabled').value = data.metrics_enabled ? 'true' : 'false';
+            document.getElementById('metricsInterval').value = data.metrics_interval || 60;
+            document.getElementById('alertEnabled').value = data.alert_enabled ? 'true' : 'false';
+            document.getElementById('alertThreshold').value = data.alert_threshold || 0.8;
+            document.getElementById('notificationEmail').value = data.notification_email || '';
+            
+            // Security settings
+            document.getElementById('webhookVerification').value = data.webhook_verification ? 'true' : 'false';
+            document.getElementById('rateLimiting').value = data.rate_limiting ? 'true' : 'false';
+            document.getElementById('maxRequests').value = data.max_requests || 100;
+            document.getElementById('sessionTimeout').value = data.session_timeout || 30;
+            document.getElementById('requireAuth').value = data.require_auth ? 'true' : 'false';
+            document.getElementById('allowedOrigins').value = data.allowed_origins || '';
+            
+            // Checkboxes
+            document.getElementById('meetingStarted').checked = data.webhook_events?.includes('meeting.started') || false;
+            document.getElementById('meetingEnded').checked = data.webhook_events?.includes('meeting.ended') || false;
+            document.getElementById('recordingCompleted').checked = data.webhook_events?.includes('recording.completed') || false;
+            
+            document.getElementById('highStressAlert').checked = data.alert_types?.includes('high_stress') || false;
+            document.getElementById('negativeSentimentAlert').checked = data.alert_types?.includes('negative_sentiment') || false;
+            document.getElementById('modelFailureAlert').checked = data.alert_types?.includes('model_failure') || false;
+            document.getElementById('webhookFailureAlert').checked = data.alert_types?.includes('webhook_failure') || false;
+        })
+        .catch(error => {
+            console.error('Error loading settings:', error);
+        });
+}
+
+// Update status indicator
+function updateStatusIndicator(iconId, textId, isConfigured, componentName) {
+    const icon = document.getElementById(iconId);
+    const text = document.getElementById(textId);
+    
+    if (isConfigured) {
+        icon.style.color = '#28a745'; // Green
+        text.textContent = `${componentName}: Configured`;
+    } else {
+        icon.style.color = '#dc3545'; // Red
+        text.textContent = `${componentName}: Not Configured`;
+    }
+}
+
+// Save settings
+function saveSettings() {
+    const settings = {
+        auto_download: document.getElementById('autoDownload').value,
+        sentiment_model: document.getElementById('sentimentModel').value,
+        emotion_model: document.getElementById('emotionModel').value,
+        confidence_threshold: parseFloat(document.getElementById('confidenceThreshold').value),
+        metrics_enabled: document.getElementById('metricsEnabled').value,
+        metrics_interval: parseInt(document.getElementById('metricsInterval').value),
+        alert_enabled: document.getElementById('alertEnabled').value,
+        alert_threshold: parseFloat(document.getElementById('alertThreshold').value),
+        notification_email: document.getElementById('notificationEmail').value,
+        webhook_verification: document.getElementById('webhookVerification').value,
+        rate_limiting: document.getElementById('rateLimiting').value,
+        max_requests: parseInt(document.getElementById('maxRequests').value),
+        session_timeout: parseInt(document.getElementById('sessionTimeout').value),
+        require_auth: document.getElementById('requireAuth').value,
+        allowed_origins: document.getElementById('allowedOrigins').value,
+        webhook_events: [
+            document.getElementById('meetingStarted').checked ? 'meeting.started' : null,
+            document.getElementById('meetingEnded').checked ? 'meeting.ended' : null,
+            document.getElementById('recordingCompleted').checked ? 'recording.completed' : null
+        ].filter(Boolean),
+        alert_types: [
+            document.getElementById('highStressAlert').checked ? 'high_stress' : null,
+            document.getElementById('negativeSentimentAlert').checked ? 'negative_sentiment' : null,
+            document.getElementById('modelFailureAlert').checked ? 'model_failure' : null,
+            document.getElementById('webhookFailureAlert').checked ? 'webhook_failure' : null
+        ].filter(Boolean)
+    };
+    
+    fetch('/api/settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(settings)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Settings saved successfully!');
+        } else {
+            alert('Failed to save settings: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error saving settings:', error);
+        alert('Failed to save settings');
+    });
+}
+
+// Test functions
+function testZoomConnection() {
+    fetch('/api/settings/test-zoom')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Zoom connection successful!');
+            } else {
+                alert('Zoom connection failed: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error testing Zoom connection:', error);
+            alert('Failed to test Zoom connection');
+        });
+}
+
+function testModels() {
+    fetch('/api/settings/test-models')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Model test successful!');
+            } else {
+                alert('Model test failed: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error testing models:', error);
+            alert('Failed to test models');
+        });
+}
+
+function testAlerts() {
+    fetch('/api/settings/test-alerts')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Alert test sent successfully!');
+            } else {
+                alert('Alert test failed: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error testing alerts:', error);
+            alert('Failed to test alerts');
+        });
+}
+
+function backupDatabase() {
+    fetch('/api/settings/backup-database')
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_${new Date().toISOString().split('T')[0]}.db`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        })
+        .catch(error => {
+            console.error('Error backing up database:', error);
+            alert('Failed to backup database');
+        });
+}
+
+function clearDatabase() {
+    if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+        fetch('/api/settings/clear-database', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Database cleared successfully!');
+                    loadSettings();
+                } else {
+                    alert('Failed to clear database: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing database:', error);
+                alert('Failed to clear database');
+            });
+    }
+}
+
+function rotateSecrets() {
+    if (confirm('Are you sure you want to rotate all secrets? This will invalidate current tokens.')) {
+        fetch('/api/settings/rotate-secrets', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Secrets rotated successfully!');
+                    loadSettings();
+                } else {
+                    alert('Failed to rotate secrets: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error rotating secrets:', error);
+                alert('Failed to rotate secrets');
+            });
+    }
+}
+
+function refreshSettings() {
+    loadSettings();
+}
+
+// Update confidence value display
+document.getElementById('confidenceThreshold').addEventListener('input', function() {
+    document.getElementById('confidenceValue').textContent = this.value;
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    loadSettings();
+});
+</script>
+{% endblock %} 

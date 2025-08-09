@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Speaking Feedback Tool{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-chart-bar"></i> Analytics
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshAnalytics()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="exportAnalytics()">
+            <i class="fas fa-download"></i> Export
+        </button>
+    </div>
+</div>
+
+<!-- Time Range Selector -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="timeRange" class="form-label">Time Range</label>
+                        <select class="form-select" id="timeRange" onchange="loadAnalytics()">
+                            <option value="week">Last 7 Days</option>
+                            <option value="month">Last 30 Days</option>
+                            <option value="quarter">Last 3 Months</option>
+                            <option value="year">Last Year</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="groupBy" class="form-label">Group By</label>
+                        <select class="form-select" id="groupBy" onchange="loadAnalytics()">
+                            <option value="day">Day</option>
+                            <option value="week">Week</option>
+                            <option value="month">Month</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="metricType" class="form-label">Metric</label>
+                        <select class="form-select" id="metricType" onchange="loadAnalytics()">
+                            <option value="sentiment">Sentiment</option>
+                            <option value="stress">Stress Level</option>
+                            <option value="emotion">Emotion</option>
+                            <option value="confidence">Confidence</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="button" class="btn btn-outline-primary" onclick="toggleRealTime()">
+                                <i class="fas fa-play" id="realTimeIcon"></i> <span id="realTimeText">Real-time</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Metrics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="metric-value" id="total-meetings-analytics">-</div>
+            <div class="metric-label">Total Meetings</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="metric-value" id="avg-sentiment-analytics">-</div>
+            <div class="metric-label">Avg Sentiment</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="metric-value" id="avg-stress-analytics">-</div>
+            <div class="metric-label">Avg Stress</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="metric-value" id="success-rate">-</div>
+            <div class="metric-label">Success Rate</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Trend Analysis
+            </div>
+            <div class="card-body">
+                <canvas id="trendChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i> Distribution
+            </div>
+            <div class="card-body">
+                <canvas id="distributionChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 2 -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-bar"></i> Performance by Time
+            </div>
+            <div class="card-body">
+                <canvas id="timeChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-area"></i> Correlation Analysis
+            </div>
+            <div class="card-body">
+                <canvas id="correlationChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Insights -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-lightbulb"></i> Insights
+            </div>
+            <div class="card-body">
+                <div id="insights">
+                    <div class="loading"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle"></i> Anomalies
+            </div>
+            <div class="card-body">
+                <div id="anomalies">
+                    <div class="loading"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let trendChart, distributionChart, timeChart, correlationChart;
+let realTimeEnabled = false;
+let realTimeInterval = null;
+
+// Initialize charts
+function initCharts() {
+    // Trend Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    trendChart = new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Metric',
+                data: [],
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Distribution Chart
+    const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+    distributionChart = new Chart(distributionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: [
+                    '#28a745',
+                    '#6c757d',
+                    '#17a2b8',
+                    '#dc3545',
+                    '#ffc107'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Time Chart
+    const timeCtx = document.getElementById('timeChart').getContext('2d');
+    timeChart = new Chart(timeCtx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Performance',
+                data: [],
+                backgroundColor: '#007bff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Correlation Chart
+    const correlationCtx = document.getElementById('correlationChart').getContext('2d');
+    correlationChart = new Chart(correlationCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Sentiment vs Stress',
+                data: [],
+                backgroundColor: '#007bff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Sentiment Score'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Stress Level'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Load analytics data
+function loadAnalytics() {
+    const timeRange = document.getElementById('timeRange').value;
+    const groupBy = document.getElementById('groupBy').value;
+    const metricType = document.getElementById('metricType').value;
+    
+    showLoading('insights');
+    showLoading('anomalies');
+    
+    fetch(`/api/analytics?time_range=${timeRange}&group_by=${groupBy}&metric=${metricType}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update metrics
+            document.getElementById('total-meetings-analytics').textContent = data.total_meetings || 0;
+            document.getElementById('avg-sentiment-analytics').textContent = data.avg_sentiment ? data.avg_sentiment.toFixed(2) : 'N/A';
+            document.getElementById('avg-stress-analytics').textContent = data.avg_stress ? data.avg_stress.toFixed(2) : 'N/A';
+            document.getElementById('success-rate').textContent = data.success_rate ? (data.success_rate * 100).toFixed(1) + '%' : 'N/A';
+            
+            // Update trend chart
+            if (data.trend) {
+                trendChart.data.labels = data.trend.labels;
+                trendChart.data.datasets[0].data = data.trend.data;
+                trendChart.data.datasets[0].label = metricType.charAt(0).toUpperCase() + metricType.slice(1);
+                trendChart.update();
+            }
+            
+            // Update distribution chart
+            if (data.distribution) {
+                distributionChart.data.labels = data.distribution.labels;
+                distributionChart.data.datasets[0].data = data.distribution.data;
+                distributionChart.update();
+            }
+            
+            // Update time chart
+            if (data.time_performance) {
+                timeChart.data.labels = data.time_performance.labels;
+                timeChart.data.datasets[0].data = data.time_performance.data;
+                timeChart.update();
+            }
+            
+            // Update correlation chart
+            if (data.correlation) {
+                correlationChart.data.datasets[0].data = data.correlation;
+                correlationChart.update();
+            }
+            
+            // Update insights
+            if (data.insights) {
+                const insightsHtml = data.insights.map(insight => `
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb"></i> ${insight.message}
+                    </div>
+                `).join('');
+                document.getElementById('insights').innerHTML = insightsHtml;
+            } else {
+                document.getElementById('insights').innerHTML = '<p class="text-muted">No insights available for this time range.</p>';
+            }
+            
+            // Update anomalies
+            if (data.anomalies) {
+                const anomaliesHtml = data.anomalies.map(anomaly => `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> ${anomaly.message}
+                    </div>
+                `).join('');
+                document.getElementById('anomalies').innerHTML = anomaliesHtml;
+            } else {
+                document.getElementById('anomalies').innerHTML = '<p class="text-muted">No anomalies detected.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading analytics:', error);
+            showError('insights', 'Failed to load analytics data');
+            showError('anomalies', 'Failed to load anomalies');
+        });
+}
+
+// Toggle real-time updates
+function toggleRealTime() {
+    realTimeEnabled = !realTimeEnabled;
+    const icon = document.getElementById('realTimeIcon');
+    const text = document.getElementById('realTimeText');
+    
+    if (realTimeEnabled) {
+        icon.className = 'fas fa-pause';
+        text.textContent = 'Pause';
+        realTimeInterval = setInterval(loadAnalytics, 30000); // Update every 30 seconds
+    } else {
+        icon.className = 'fas fa-play';
+        text.textContent = 'Real-time';
+        if (realTimeInterval) {
+            clearInterval(realTimeInterval);
+            realTimeInterval = null;
+        }
+    }
+}
+
+// Refresh analytics
+function refreshAnalytics() {
+    loadAnalytics();
+}
+
+// Export analytics
+function exportAnalytics() {
+    const timeRange = document.getElementById('timeRange').value;
+    const groupBy = document.getElementById('groupBy').value;
+    const metricType = document.getElementById('metricType').value;
+    
+    fetch(`/api/analytics/export?time_range=${timeRange}&group_by=${groupBy}&metric=${metricType}`)
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `analytics_${timeRange}_${metricType}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        })
+        .catch(error => {
+            console.error('Error exporting analytics:', error);
+            alert('Failed to export analytics');
+        });
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    initCharts();
+    loadAnalytics();
+});
+</script>
+{% endblock %} 
