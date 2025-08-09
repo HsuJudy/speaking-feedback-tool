@@ -1,0 +1,46 @@
+{
+  "9fd78ddf1b085c9dc1caa5451570e12e497ad9360fa6bd00f6e25d300d212203": {
+    "dataset_name": "demo_emotion_dataset",
+    "file_path": "demo_data/initial_dataset.csv",
+    "content_hash": "9fd78ddf1b085c9dc1caa5451570e12e497ad9360fa6bd00f6e25d300d212203",
+    "description": "Initial version of emotion classification dataset",
+    "tags": [
+      "emotion",
+      "audio",
+      "demo"
+    ],
+    "created_at": "2025-08-01T15:22:43.483971",
+    "file_size": 4153,
+    "file_modified": "2025-08-01T15:22:43.483924"
+  },
+  "fd1224a1ccc43d617626288c08cf1196c54569e929998d8cc10f2d824d2f05b8": {
+    "dataset_name": "emotion_classification_train",
+    "file_path": "demo_data/splits/emotion_classification/train.csv",
+    "content_hash": "fd1224a1ccc43d617626288c08cf1196c54569e929998d8cc10f2d824d2f05b8",
+    "description": "Training split for emotion_classification",
+    "tags": [],
+    "created_at": "2025-08-01T15:22:43.487679",
+    "file_size": 2862,
+    "file_modified": "2025-08-01T15:22:43.487200"
+  },
+  "39afb051edb5e51a909a700533e1ada115a64468cadfb2e8e62134c313c64caf": {
+    "dataset_name": "emotion_classification_val",
+    "file_path": "demo_data/splits/emotion_classification/val.csv",
+    "content_hash": "39afb051edb5e51a909a700533e1ada115a64468cadfb2e8e62134c313c64caf",
+    "description": "Validation split for emotion_classification",
+    "tags": [],
+    "created_at": "2025-08-01T15:22:43.487844",
+    "file_size": 639,
+    "file_modified": "2025-08-01T15:22:43.487438"
+  },
+  "c73a304d98b462ec5da1c1fbdfcdb7bd24e8e076ee8b11e930c5a77035e4758d": {
+    "dataset_name": "emotion_classification_test",
+    "file_path": "demo_data/splits/emotion_classification/test.csv",
+    "content_hash": "c73a304d98b462ec5da1c1fbdfcdb7bd24e8e076ee8b11e930c5a77035e4758d",
+    "description": "Test split for emotion_classification",
+    "tags": [],
+    "created_at": "2025-08-01T15:22:43.487974",
+    "file_size": 640,
+    "file_modified": "2025-08-01T15:22:43.487623"
+  }
+}

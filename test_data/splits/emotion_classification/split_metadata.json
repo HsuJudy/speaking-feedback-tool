@@ -1,0 +1,12 @@
+{
+  "split_name": "emotion_classification",
+  "original_dataset": "test_data/sample_dataset.csv",
+  "train_ratio": 0.7,
+  "val_ratio": 0.15,
+  "test_ratio": 0.15,
+  "random_seed": 42,
+  "train_hash": "fd1224a1ccc43d617626288c08cf1196c54569e929998d8cc10f2d824d2f05b8",
+  "val_hash": "39afb051edb5e51a909a700533e1ada115a64468cadfb2e8e62134c313c64caf",
+  "test_hash": "c73a304d98b462ec5da1c1fbdfcdb7bd24e8e076ee8b11e930c5a77035e4758d",
+  "created_at": "2025-08-01T09:35:47.502575"
+}

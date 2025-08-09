@@ -1,0 +1,50 @@
+{
+  "results": [
+    {
+      "input_text": "i love this product! its amazing and works perfectly.",
+      "sentiment": "positive",
+      "confidence": 0.853,
+      "processed_at": "2025-07-29T15:09:50.627297",
+      "model_info": {
+        "version": "dummy_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 0,
+      "sentiment_emoji": "\ud83d\ude0a"
+    },
+    {
+      "input_text": "this is the worst experience ive ever had. terrible service!",
+      "sentiment": "negative",
+      "confidence": 0.841,
+      "processed_at": "2025-07-29T15:09:50.627305",
+      "model_info": {
+        "version": "dummy_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 1,
+      "sentiment_emoji": "\ud83d\ude1e"
+    },
+    {
+      "input_text": "the movie was okay, nothing special but not bad either.",
+      "sentiment": "negative",
+      "confidence": 0.905,
+      "processed_at": "2025-07-29T15:09:50.627312",
+      "model_info": {
+        "version": "dummy_v1.0",
+        "inference_timestamp": "2024-01-01T00:00:00Z"
+      },
+      "batch_index": 2,
+      "sentiment_emoji": "\ud83d\ude1e"
+    }
+  ],
+  "summary": {
+    "total_processed": 3,
+    "sentiment_distribution": {
+      "positive": 1,
+      "negative": 2
+    },
+    "average_confidence": 0.866,
+    "summary_generated_at": "2025-07-29T15:09:50.627418"
+  },
+  "exported_at": "2025-07-29T15:09:50.627422"
+}
