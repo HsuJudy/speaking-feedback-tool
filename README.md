@@ -1,17 +1,42 @@
 # 🎤 Speaking Feedback Tool
 
-A real-time speaking feedback and sentiment analysis tool that integrates with Zoom meetings to provide instant feedback on speaking quality, tone, and sentiment.
+A real-time speaking feedback and sentiment analysis tool that integrates with Zoom meetings to provide instant feedback on speaking quality, tone, and sentiment. Features a modern web interface, complete CI/CD pipeline, and enterprise-grade MLOps stack.
 
 ## 🚀 Features
 
+### **🎯 Core Functionality**
 - **Real-time Zoom Integration**: Automatically processes Zoom meetings via webhooks
 - **Sentiment Analysis**: Analyzes speaking tone and sentiment using ML models
 - **Audio Processing**: Extracts and processes audio from Zoom recordings
-- **Dashboard**: Web interface to view analysis results and meeting history
-- **Multi-Model Support**: Supports various ML models (HuggingFace, NeMo, custom models)
-- **Complete MLOps Stack**: DVC for data versioning, W&B for experiments, MLflow for model serving
-- **NVIDIA GPU Acceleration**: Triton Inference Server and NeMo models for enterprise-grade serving
-- **Secure**: Local processing with automatic cleanup of sensitive data
+- **Stress Level Detection**: Identifies speaking anxiety and stress patterns
+- **Emotion Recognition**: Detects emotional states during presentations
+
+### **🎨 Modern Web Interface**
+- **Responsive Dashboard**: Real-time metrics, charts, and insights
+- **Meeting Management**: Search, filter, and analyze meeting history
+- **Advanced Analytics**: Interactive charts and trend analysis
+- **Settings Management**: Secure configuration with environment variables
+- **Mobile-Friendly**: Works perfectly on all devices
+
+### **🏗️ Enterprise MLOps Stack**
+- **DVC**: Data versioning and pipeline management
+- **Weights & Biases**: Experiment tracking and model management
+- **MLflow**: Model serving and lifecycle management
+- **NVIDIA Triton**: GPU-accelerated model serving
+- **NeMo Models**: State-of-the-art speech AI models
+
+### **🔧 DevOps & CI/CD**
+- **GitHub Actions**: Complete CI/CD pipeline automation
+- **Docker & Kubernetes**: Production-ready containerization
+- **Prometheus & Grafana**: Real-time monitoring and alerting
+- **Security Scanning**: Automated vulnerability detection
+- **Multi-Environment**: Staging and production deployments
+
+### **🔒 Security & Compliance**
+- **Local Processing**: All analysis happens on your server
+- **Secure Webhooks**: HMAC signature verification
+- **Environment Variables**: Credentials stored securely
+- **Data Privacy**: Automatic cleanup of sensitive data
 
 ## 🏗️ Architecture
 
@@ -26,6 +51,12 @@ A real-time speaking feedback and sentiment analysis tool that integrates with Z
                        │  SQLite DB      │    │  Analysis       │
                        │  (Results)      │    │  Results        │
                        └─────────────────┘    └─────────────────┘
+                                │                       │
+                                ▼                       ▼
+                       ┌─────────────────┐    ┌─────────────────┐
+                       │  Modern Web     │    │  Real-time      │
+                       │  Interface      │    │  Dashboard      │
+                       └─────────────────┘    └─────────────────┘
 ```
 
 ## 📋 Prerequisites
@@ -34,13 +65,15 @@ A real-time speaking feedback and sentiment analysis tool that integrates with Z
 - Zoom Developer Account
 - ngrok (for local development)
 - ffmpeg (for audio processing)
+- Docker (for containerized deployment)
+- Kubernetes cluster (for production deployment)
 
 ## 🛠️ Installation
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
-cd Speaking-Feedback-Tool/vibe-check
+git clone https://github.com/HsuJudy/speaking-feedback-tool.git
+cd speaking-feedback-tool/vibe-check
 ```
 
 ### 2. Install Dependencies
@@ -51,7 +84,7 @@ pip install -r requirements.txt
 ### 3. Set Up Environment Variables
 ```bash
 cp env_example.txt .env
-# Edit .env with your Zoom credentials
+# Edit .env with your Zoom credentials (see ENV_SETUP_GUIDE.md)
 ```
 
 ### 4. Install ffmpeg
@@ -102,7 +135,13 @@ ZOOM_WEBHOOK_SECRET=your_webhook_secret
 FLASK_ENV=development
 PORT=5001
 RECORDINGS_DIR=zoom_recordings
+
+# Optional: MLOps Stack
+WANDB_API_KEY=your_wandb_api_key
+MLFLOW_TRACKING_URI=http://localhost:5000
 ```
+
+**📖 See [ENV_SETUP_GUIDE.md](ENV_SETUP_GUIDE.md) for detailed setup instructions.**
 
 ## 🚀 Usage
 
@@ -113,12 +152,17 @@ RECORDINGS_DIR=zoom_recordings
 python app.py
 ```
 
-2. **Start ngrok (for webhook testing):**
+2. **Access the Web Interface:**
+```
+http://localhost:5001
+```
+
+3. **Start ngrok (for webhook testing):**
 ```bash
 ngrok http 5001
 ```
 
-3. **Update Zoom webhook URL** with your ngrok URL:
+4. **Update Zoom webhook URL** with your ngrok URL:
 ```
 https://your-ngrok-url.ngrok-free.app/webhook/zoom
 ```
@@ -132,6 +176,9 @@ https://your-ngrok-url.ngrok-free.app/webhook/zoom
 
 # Deploy to Kubernetes
 ./scripts/deploy-k8s.sh
+
+# Set up cloud Kubernetes
+./scripts/setup-cloud-k8s.sh
 ```
 
 #### Option 2: Heroku
@@ -155,7 +202,33 @@ heroku config:set ZOOM_CLIENT_ID=your_client_id
 # Set environment variables in App Platform dashboard
 ```
 
-## 📊 API Endpoints
+## 📊 Web Interface
+
+### **Dashboard** (`/`)
+- Real-time metrics and system status
+- Interactive charts (sentiment trends, emotion distribution)
+- Recent meetings with analysis results
+- System alerts and notifications
+
+### **Meetings** (`/meetings`)
+- Search and filter meeting history
+- Detailed meeting information
+- Download analysis results
+- Meeting analytics and insights
+
+### **Analytics** (`/analytics`)
+- Advanced trend analysis
+- Performance metrics
+- Correlation analysis
+- Export functionality
+
+### **Settings** (`/settings`)
+- Configuration management
+- Environment variable status
+- Test connections (Zoom, ML models)
+- Database backup and management
+
+## 🔧 API Endpoints
 
 ### Webhook Endpoints
 - `POST /webhook/zoom` - Zoom webhook receiver
@@ -167,8 +240,15 @@ heroku config:set ZOOM_CLIENT_ID=your_client_id
 - `GET /meeting/<meeting_id>` - Meeting details
 - `GET /api/meetings/<meeting_id>/analysis` - Analysis results
 
-### Health Check
+### Settings Endpoints
+- `GET /api/settings` - Get configuration status
+- `POST /api/settings` - Save settings
+- `GET /api/settings/test-zoom` - Test Zoom connection
+- `GET /api/settings/test-models` - Test ML models
+
+### Health & Monitoring
 - `GET /health` - Application health status
+- `GET /metrics` - Prometheus metrics
 
 ## 🔍 Testing
 
@@ -204,6 +284,24 @@ python demo_nvidia_mlops.py
 ./scripts/setup-monitoring.sh
 ```
 
+## 🚀 CI/CD Pipeline
+
+### **GitHub Actions Workflows**
+- **`ci-cd.yml`**: Main CI/CD pipeline with testing, building, and deployment
+- **`ml-training.yml`**: Automated ML model training and deployment
+- **`security-scan.yml`**: Security vulnerability scanning
+- **`deployment.yml`**: Multi-environment deployment automation
+
+### **Pipeline Features**
+- ✅ **Code Quality**: Linting, type checking, unit tests
+- ✅ **Security Scanning**: Dependency vulnerabilities, code security
+- ✅ **ML Testing**: Model validation and performance testing
+- ✅ **Docker Builds**: Multi-platform container images
+- ✅ **Kubernetes Deployment**: Automated staging and production deployment
+- ✅ **Monitoring Setup**: Prometheus and Grafana deployment
+
+**📖 See [CI_CD_SUMMARY.md](CI_CD_SUMMARY.md) for detailed pipeline documentation.**
+
 ## 📁 Project Structure
 
 ```
@@ -214,6 +312,17 @@ vibe-check/
 ├── mlflow_integration.py      # MLflow model serving & lifecycle
 ├── triton_integration.py      # Triton GPU serving & NeMo models
 ├── inference.py               # ML pipeline
+├── templates/                 # Web interface templates
+│   ├── base.html             # Base template with Bootstrap 5
+│   ├── dashboard.html        # Interactive dashboard
+│   ├── meetings.html         # Meeting management
+│   ├── analytics.html        # Advanced analytics
+│   └── settings.html         # Configuration management
+├── .github/workflows/         # CI/CD pipelines
+│   ├── ci-cd.yml            # Main CI/CD pipeline
+│   ├── deployment.yml        # Deployment automation
+│   ├── ml-training.yml      # ML training pipeline
+│   └── security-scan.yml    # Security scanning
 ├── models/                    # ML models
 │   ├── audio_emotion_model.py
 │   ├── sentiment_model.py
@@ -238,6 +347,7 @@ vibe-check/
 ├── scripts/                   # Deployment scripts
 │   ├── deploy-docker.sh
 │   ├── deploy-k8s.sh
+│   ├── setup-cloud-k8s.sh
 │   └── setup-monitoring.sh
 ├── monitoring/                # Monitoring configuration
 │   ├── prometheus.yml
@@ -246,8 +356,14 @@ vibe-check/
 │   └── grafana/
 │       └── dashboards/
 │           └── speaking-feedback-dashboard.json
+├── deployment-guides/         # Cloud deployment guides
+│   ├── aws-eks-setup.md
+│   ├── gke-setup.md
+│   └── digitalocean-k8s-setup.md
 ├── .env                      # Environment variables (not in git)
 ├── .gitignore               # Git ignore rules
+├── CI_CD_SUMMARY.md         # CI/CD documentation
+├── ENV_SETUP_GUIDE.md       # Environment setup guide
 └── README.md                # This file
 ```
 
@@ -257,6 +373,8 @@ vibe-check/
 - **Local processing**: All analysis happens on your server
 - **Secure webhooks**: HMAC signature verification
 - **Environment variables**: Credentials stored securely
+- **Security scanning**: Automated vulnerability detection
+- **Rate limiting**: Protection against abuse
 
 ## 🤝 Contributing
 
@@ -287,21 +405,55 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Verify model files are present
 - Check Python dependencies are installed
 
+**Web interface not loading:**
+- Check if Flask app is running on correct port
+- Verify all templates are in the templates/ directory
+- Check browser console for JavaScript errors
+
 ### Getting Help
 
 - Check the [ZOOM_SETUP_GUIDE.md](ZOOM_SETUP_GUIDE.md) for detailed setup instructions
 - Review [ZOOM_INTEGRATION_SUMMARY.md](ZOOM_INTEGRATION_SUMMARY.md) for technical details
+- See [ENV_SETUP_GUIDE.md](ENV_SETUP_GUIDE.md) for environment configuration
+- Review [CI_CD_SUMMARY.md](CI_CD_SUMMARY.md) for pipeline documentation
 - Open an issue on GitHub for bugs or feature requests
 
 ## 🎯 Roadmap
 
+### **Short Term**
 - [ ] Real-time sentiment analysis during meetings
 - [ ] Speaker identification and individual feedback
 - [ ] Advanced speaking metrics (pace, filler words)
 - [ ] Integration with other video platforms
+
+### **Medium Term**
 - [ ] Mobile app for feedback viewing
 - [ ] Team analytics and reporting
+- [ ] Advanced ML models (BERT, GPT)
+- [ ] Multi-language support
+
+### **Long Term**
+- [ ] AI-powered speaking coach
+- [ ] Integration with presentation software
+- [ ] Enterprise SSO integration
+- [ ] Advanced analytics and insights
+
+## 🏆 Features Overview
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Zoom Integration | ✅ Complete | Real-time webhook processing |
+| Web Interface | ✅ Complete | Modern, responsive dashboard |
+| ML Pipeline | ✅ Complete | Sentiment and emotion analysis |
+| CI/CD Pipeline | ✅ Complete | Automated testing and deployment |
+| Docker Support | ✅ Complete | Containerized deployment |
+| Kubernetes | ✅ Complete | Production orchestration |
+| Monitoring | ✅ Complete | Prometheus & Grafana |
+| Security | ✅ Complete | Vulnerability scanning |
+| Documentation | ✅ Complete | Comprehensive guides |
 
 ---
 
-**Made with ❤️ for better speaking skills** 
+**Made with ❤️ for better speaking skills**
+
+**Ready for production deployment! 🚀** 
