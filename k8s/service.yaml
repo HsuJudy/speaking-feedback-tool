@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: speaking-feedback-service
+  namespace: speaking-feedback
+  labels:
+    app: speaking-feedback-app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 5001
+    protocol: TCP
+    name: http
+  selector:
+    app: speaking-feedback-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow-service
+  namespace: speaking-feedback
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+    name: mlflow
+  selector:
+    app: mlflow
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: triton-service
+  namespace: speaking-feedback
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  - port: 8001
+    targetPort: 8001
+    protocol: TCP
+    name: grpc
+  - port: 8002
+    targetPort: 8002
+    protocol: TCP
+    name: metrics
+  selector:
+    app: triton 

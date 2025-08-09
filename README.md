@@ -9,6 +9,8 @@ A real-time speaking feedback and sentiment analysis tool that integrates with Z
 - **Audio Processing**: Extracts and processes audio from Zoom recordings
 - **Dashboard**: Web interface to view analysis results and meeting history
 - **Multi-Model Support**: Supports various ML models (HuggingFace, NeMo, custom models)
+- **Complete MLOps Stack**: DVC for data versioning, W&B for experiments, MLflow for model serving
+- **NVIDIA GPU Acceleration**: Triton Inference Server and NeMo models for enterprise-grade serving
 - **Secure**: Local processing with automatic cleanup of sensitive data
 
 ## 🏗️ Architecture
@@ -123,7 +125,16 @@ https://your-ngrok-url.ngrok-free.app/webhook/zoom
 
 ### Production Deployment
 
-#### Option 1: Heroku
+#### Option 1: Docker & Kubernetes (Recommended)
+```bash
+# Deploy with Docker Compose (local)
+./scripts/deploy-docker.sh
+
+# Deploy to Kubernetes
+./scripts/deploy-k8s.sh
+```
+
+#### Option 2: Heroku
 ```bash
 # Install Heroku CLI
 heroku create your-app-name
@@ -132,13 +143,13 @@ heroku config:set ZOOM_CLIENT_ID=your_client_id
 # ... set other environment variables
 ```
 
-#### Option 2: Railway
+#### Option 3: Railway
 ```bash
 # Connect your GitHub repo to Railway
 # Set environment variables in Railway dashboard
 ```
 
-#### Option 3: DigitalOcean App Platform
+#### Option 4: DigitalOcean App Platform
 ```bash
 # Connect your GitHub repo to DigitalOcean
 # Set environment variables in App Platform dashboard
@@ -178,6 +189,21 @@ curl -X POST http://localhost:5001/webhook/zoom \
 python demo_zoom_integration.py
 ```
 
+### Test MLflow Integration
+```bash
+python demo_mlflow_integration.py
+```
+
+### Test NVIDIA MLOps Stack
+```bash
+python demo_nvidia_mlops.py
+```
+
+### Set Up Monitoring
+```bash
+./scripts/setup-monitoring.sh
+```
+
 ## 📁 Project Structure
 
 ```
@@ -185,6 +211,8 @@ vibe-check/
 ├── app.py                      # Flask web application
 ├── zoom_integration.py         # Zoom API integration
 ├── zoom_config.py             # Configuration management
+├── mlflow_integration.py      # MLflow model serving & lifecycle
+├── triton_integration.py      # Triton GPU serving & NeMo models
 ├── inference.py               # ML pipeline
 ├── models/                    # ML models
 │   ├── audio_emotion_model.py
@@ -197,6 +225,27 @@ vibe-check/
 ├── utils/                     # Utility functions
 ├── zoom_recordings/           # Downloaded recordings
 ├── requirements.txt           # Python dependencies
+├── Dockerfile                # Docker container definition
+├── docker-compose.yml        # Multi-service Docker setup
+├── k8s/                      # Kubernetes manifests
+│   ├── namespace.yaml
+│   ├── configmap.yaml
+│   ├── secret.yaml
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── persistent-volumes.yaml
+│   └── ingress.yaml
+├── scripts/                   # Deployment scripts
+│   ├── deploy-docker.sh
+│   ├── deploy-k8s.sh
+│   └── setup-monitoring.sh
+├── monitoring/                # Monitoring configuration
+│   ├── prometheus.yml
+│   ├── rules/
+│   │   └── alerts.yml
+│   └── grafana/
+│       └── dashboards/
+│           └── speaking-feedback-dashboard.json
 ├── .env                      # Environment variables (not in git)
 ├── .gitignore               # Git ignore rules
 └── README.md                # This file

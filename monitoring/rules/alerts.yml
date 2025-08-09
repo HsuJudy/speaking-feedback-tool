@@ -1,0 +1,125 @@
+groups:
+  - name: speaking-feedback-alerts
+    rules:
+      # Application health alerts
+      - alert: SpeakingFeedbackAppDown
+        expr: up{job="speaking-feedback-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Speaking Feedback App is down"
+          description: "The speaking feedback application has been down for more than 1 minute"
+
+      - alert: SpeakingFeedbackAppHighErrorRate
+        expr: rate(http_requests_total{job="speaking-feedback-app", status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate in Speaking Feedback App"
+          description: "Error rate is above 10% for the last 5 minutes"
+
+      # Zoom integration alerts
+      - alert: ZoomWebhookFailures
+        expr: rate(zoom_webhook_failures_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Zoom webhook failures detected"
+          description: "Zoom webhook processing is failing"
+
+      - alert: ZoomRecordingProcessingSlow
+        expr: histogram_quantile(0.95, rate(zoom_recording_processing_duration_seconds_bucket[5m])) > 30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow Zoom recording processing"
+          description: "95th percentile of recording processing time is above 30 seconds"
+
+      # ML pipeline alerts
+      - alert: MLPipelineFailures
+        expr: rate(ml_pipeline_failures_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "ML pipeline failures detected"
+          description: "Machine learning pipeline is experiencing failures"
+
+      - alert: ModelInferenceSlow
+        expr: histogram_quantile(0.95, rate(model_inference_duration_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow model inference"
+          description: "95th percentile of model inference time is above 5 seconds"
+
+      # GPU alerts (if using Triton)
+      - alert: TritonServerDown
+        expr: up{job="triton"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Triton Inference Server is down"
+          description: "The Triton inference server has been down for more than 1 minute"
+
+      - alert: GPUUtilizationHigh
+        expr: gpu_utilization_percent > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High GPU utilization"
+          description: "GPU utilization is above 90% for more than 5 minutes"
+
+      # Infrastructure alerts
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 90%"
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is above 80%"
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space"
+          description: "Disk usage is above 90%"
+
+      # Database alerts
+      - alert: PostgreSQLDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL database has been down for more than 1 minute"
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache has been down for more than 1 minute" 

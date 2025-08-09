@@ -7,10 +7,19 @@ from flask import Flask, request, jsonify, render_template_string
 import os
 import json
 import logging
+import time
 from datetime import datetime
 from typing import Dict, Any
 import sqlite3
 from pathlib import Path
+
+# Prometheus metrics
+try:
+    from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+    PROMETHEUS_AVAILABLE = True
+except ImportError:
+    PROMETHEUS_AVAILABLE = False
+    logging.warning("Prometheus client not available. Install prometheus_client for metrics.")
 
 from zoom_integration import ZoomIntegration
 
@@ -25,6 +34,23 @@ zoom_integration = ZoomIntegration()
 
 # Database setup
 DB_PATH = "zoom_analysis.db"
+
+# Initialize Prometheus metrics
+if PROMETHEUS_AVAILABLE:
+    # Counters
+    http_requests_total = Counter('http_requests_total', 'Total HTTP requests', ['method', 'status'])
+    zoom_webhook_events_total = Counter('zoom_webhook_events_total', 'Total Zoom webhook events', ['event_type'])
+    zoom_webhook_failures_total = Counter('zoom_webhook_failures_total', 'Total Zoom webhook failures')
+    ml_pipeline_failures_total = Counter('ml_pipeline_failures_total', 'Total ML pipeline failures')
+    
+    # Histograms
+    http_request_duration_seconds = Histogram('http_request_duration_seconds', 'HTTP request duration', ['method', 'endpoint'])
+    zoom_recording_processing_duration_seconds = Histogram('zoom_recording_processing_duration_seconds', 'Zoom recording processing duration')
+    model_inference_duration_seconds = Histogram('model_inference_duration_seconds', 'Model inference duration', ['model_name'])
+    
+    # Gauges
+    speaking_feedback_active_meetings = Gauge('speaking_feedback_active_meetings', 'Number of active meetings')
+    speaking_feedback_total_meetings = Gauge('speaking_feedback_total_meetings', 'Total number of meetings processed')
 
 def init_database():
     """Initialize SQLite database for storing analysis results"""
@@ -141,6 +167,8 @@ def zoom_webhook():
     """
     Handle Zoom webhook events
     """
+    start_time = time.time()
+    
     try:
         # Get request data
         payload = request.get_data(as_text=True)
@@ -165,12 +193,18 @@ def zoom_webhook():
         # Verify webhook signature
         if not zoom_integration.verify_webhook_signature(payload, signature, timestamp):
             logger.warning("Invalid webhook signature")
+            if PROMETHEUS_AVAILABLE:
+                zoom_webhook_failures_total.inc()
             return jsonify({"error": "Invalid signature"}), 401
         
         # Parse JSON payload
         event_data = json.loads(payload)
         event_type = event_data.get('event')
         meeting_id = event_data.get('payload', {}).get('object', {}).get('id')
+        
+        # Update metrics
+        if PROMETHEUS_AVAILABLE:
+            zoom_webhook_events_total.labels(event_type=event_type).inc()
         
         # Store webhook event
         store_webhook_event(event_type, meeting_id, event_data)
@@ -182,11 +216,18 @@ def zoom_webhook():
         if result.get('status') == 'success' and 'analysis_result' in result:
             store_analysis_result(meeting_id, result['analysis_result'])
         
+        # Record processing duration
+        if PROMETHEUS_AVAILABLE:
+            duration = time.time() - start_time
+            zoom_recording_processing_duration_seconds.observe(duration)
+        
         logger.info(f"Webhook processed: {event_type} for meeting {meeting_id}")
         return jsonify(result), 200
         
     except Exception as e:
         logger.error(f"Webhook processing failed: {e}")
+        if PROMETHEUS_AVAILABLE:
+            zoom_webhook_failures_total.inc()
         return jsonify({"error": str(e)}), 500
 
 @app.route('/health', methods=['GET'])
@@ -197,6 +238,14 @@ def health_check():
         "timestamp": datetime.now().isoformat(),
         "zoom_integration": "active"
     })
+
+@app.route('/metrics', methods=['GET'])
+def metrics():
+    """Prometheus metrics endpoint"""
+    if PROMETHEUS_AVAILABLE:
+        return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
+    else:
+        return jsonify({"error": "Prometheus metrics not available"}), 503
 
 @app.route('/meetings', methods=['GET'])
 def list_meetings():
