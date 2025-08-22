@@ -99,9 +99,18 @@ __pypackages__/
 
 # Celery
 
-# Interview preparation materials (sensitive)
+# Interview preparation materials (sensitive) - NEVER COMMIT
 *_INTERVIEW_GUIDE.md
 *_INTERVIEW_SUMMARY.md
+*_INTERVIEW_*.md
+*interview*.md
+*Interview*.md
+interview_questions/
+*_interview_demo/
+*_interview_*
+interview_prep/
+interview_preparation/
+interview_materials/
 celerybeat-schedule
 celerybeat.pid
 
