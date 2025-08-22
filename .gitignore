@@ -98,6 +98,10 @@ Pipfile.lock
 __pypackages__/
 
 # Celery
+
+# Interview preparation materials (sensitive)
+*_INTERVIEW_GUIDE.md
+*_INTERVIEW_SUMMARY.md
 celerybeat-schedule
 celerybeat.pid
 
