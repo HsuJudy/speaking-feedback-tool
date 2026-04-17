@@ -166,3 +166,12 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log* 
+
+# Generated results and nonessential demo/test artifacts
+pipeline_results*.json
+demo_*.py
+
+demo_data/
+multi_demo_data/
+test_data/
+test_advanced_data/
