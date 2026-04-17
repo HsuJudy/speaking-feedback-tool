@@ -247,7 +247,7 @@ def metrics():
     else:
         return jsonify({"error": "Prometheus metrics not available"}), 503
 
-@app.route('/meetings', methods=['GET'])
+@app.route('/api/meetings/summary', methods=['GET'])
 def list_meetings():
     """List all analyzed meetings"""
     try:
